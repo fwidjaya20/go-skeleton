@@ -7,17 +7,6 @@ import (
 	"github.com/payfazz/go-apt/pkg/fazzdb"
 )
 
-type TodoRepositoryInterface interface {
-	Find(ctx context.Context, id int64) (*model.Todo, error)
-	All(ctx context.Context, conditions []fazzdb.SliceCondition, orders []fazzdb.Order, limit int, offset int) ([]*model.Todo, error)
-	Create(ctx context.Context, m *model.Todo) (*int64, error)
-}
-
-type todoRepository struct {
-	Q    *fazzdb.Query
-	Todo *model.Todo
-}
-
 // NewTodoRepository is a constructor to construct repo
 func NewTodoRepository(q *fazzdb.Query) TodoRepositoryInterface {
 	return &todoRepository{

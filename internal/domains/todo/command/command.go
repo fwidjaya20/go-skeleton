@@ -9,23 +9,14 @@ import (
 	"github.com/payfazz/go-apt/pkg/fazzdb"
 )
 
-// TodoCommandInterface ...
-type TodoCommandInterface interface {
-	Create(ctx context.Context, payload data.PayloadCreateTodo) (*int64, error)
-}
-
-type partnerCommand struct {
-	Repository repository.TodoRepositoryInterface
-}
-
 // NewTodoCommand is a function to create new Command Instance
 func NewTodoCommand(q *fazzdb.Query) TodoCommandInterface {
-	return &partnerCommand{
+	return &todoCommand{
 		Repository: repository.NewTodoRepository(q),
 	}
 }
 
-func (c *partnerCommand) Create(ctx context.Context, payload data.PayloadCreateTodo) (*int64, error) {
+func (c *todoCommand) Create(ctx context.Context, payload data.PayloadCreateTodo) (*int64, error) {
 	t := model.TodoModel()
 
 	t.Activity = payload.Activity
