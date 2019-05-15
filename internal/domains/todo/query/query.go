@@ -10,16 +10,6 @@ import (
 	"github.com/payfazz/go-apt/pkg/fazzdb"
 )
 
-// TodoQueryInterface ...
-type TodoQueryInterface interface {
-	All(ctx context.Context, queryParams map[string]string) ([]*model.Todo, error)
-	Find(ctx context.Context, id int64) (*model.Todo, error)
-}
-
-type todoQuery struct {
-	Repository repository.TodoRepositoryInterface
-}
-
 // NewTodoQuery is a function to create new Query Instance
 func NewTodoQuery(q *fazzdb.Query) TodoQueryInterface {
 	return &todoQuery{
