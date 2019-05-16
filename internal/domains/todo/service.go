@@ -3,6 +3,8 @@ package todo
 import (
 	"context"
 
+	"github.com/payfazz/fazzlearning-api/internal/contract"
+
 	"github.com/payfazz/fazzlearning-api/internal/domains/todo/command"
 	"github.com/payfazz/fazzlearning-api/internal/domains/todo/data"
 	"github.com/payfazz/fazzlearning-api/internal/domains/todo/model"
@@ -11,7 +13,7 @@ import (
 
 // ServiceInterface ...
 type ServiceInterface interface {
-	All(ctx context.Context, queryParams map[string]string) ([]*model.Todo, error)
+	All(ctx context.Context, queryParams map[string]string) (contract.Paginate, error)
 	Create(ctx context.Context, payload data.PayloadCreateTodo) (*model.Todo, error)
 }
 
@@ -38,6 +40,17 @@ func (s *service) Create(ctx context.Context, payload data.PayloadCreateTodo) (*
 	return s.Query.Find(ctx, *id)
 }
 
-func (s *service) All(ctx context.Context, queryParams map[string]string) ([]*model.Todo, error) {
-	return s.Query.All(ctx, queryParams)
+func (s *service) All(ctx context.Context, queryParams map[string]string) (contract.Paginate, error) {
+	// mestinya bikin struct isi array model dan metadata karena sifat paginate --> butuh total data
+
+	res, err := s.Query.All(ctx, queryParams)
+
+	d := contract.Paginate{}
+
+	d.Data = res
+	d.Metadata = contract.PaginateMetadata{
+		Total: 100,
+	}
+
+	return d, err
 }
