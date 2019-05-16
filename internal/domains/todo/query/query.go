@@ -15,6 +15,7 @@ import (
 func NewTodoQuery() TodoQueryInterface {
 	db := config.GetDb()
 	q := fazzdb.QueryDb(db, config.GetIfQueryConfig(config.I_QUERY_CONFIG))
+
 	return &todoQuery{
 		Repository: repository.NewTodoRepository(q),
 	}
