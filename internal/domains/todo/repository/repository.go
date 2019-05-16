@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/payfazz/fazzlearning-api/internal/domains/todo/model"
+	"github.com/payfazz/fazzlearning-api/lib/tx"
 	"github.com/payfazz/go-apt/pkg/fazzdb"
 )
 
@@ -52,22 +53,30 @@ func (r *todoRepository) Find(ctx context.Context, id int64) (*model.Todo, error
 }
 
 func (r *todoRepository) All(ctx context.Context, conditions []fazzdb.SliceCondition, orders []fazzdb.Order, limit int, offset int) ([]*model.Todo, error) {
-	current := r.Q.Use(r.Todo).
-		WhereMany(conditions...).
-		OrderByMany(orders...)
+	rows, errTrans := tx.RunDefault(r.Q.Db, func(q *fazzdb.Query) (interface{}, error) {
+		current := r.Q.Use(r.Todo).
+			WhereMany(conditions...).
+			OrderByMany(orders...)
 
-	if limit > 0 {
-		current.WithLimit(limit)
-	}
+		if limit > 0 {
+			current.WithLimit(limit)
+		}
 
-	if offset > 0 {
-		current.WithOffset(offset)
-	}
+		if offset > 0 {
+			current.WithOffset(offset)
+		}
 
-	rows, err := current.AllCtx(ctx)
+		r, err := current.AllCtx(ctx)
 
-	if nil != err {
-		return nil, err
+		if nil != err {
+			return nil, err
+		}
+
+		return r, nil
+	})
+
+	if nil != errTrans {
+		return nil, errTrans
 	}
 
 	result := rows.([]*model.Todo)
