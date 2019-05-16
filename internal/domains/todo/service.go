@@ -7,7 +7,6 @@ import (
 	"github.com/payfazz/fazzlearning-api/internal/domains/todo/data"
 	"github.com/payfazz/fazzlearning-api/internal/domains/todo/model"
 	"github.com/payfazz/fazzlearning-api/internal/domains/todo/query"
-	"github.com/payfazz/go-apt/pkg/fazzdb"
 )
 
 // ServiceInterface ...
@@ -22,10 +21,10 @@ type service struct {
 }
 
 // NewTodoService is a constructor for Todo Service
-func NewTodoService(q *fazzdb.Query) ServiceInterface {
+func NewTodoService() ServiceInterface {
 	return &service{
-		Query:   query.NewTodoQuery(q),
-		Command: command.NewTodoCommand(q),
+		Query:   query.NewTodoQuery(),
+		Command: command.NewTodoCommand(),
 	}
 }
 
