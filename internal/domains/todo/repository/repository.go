@@ -17,10 +17,18 @@ func NewTodoRepository(q *fazzdb.Query) TodoRepositoryInterface {
 }
 
 func (r *todoRepository) Create(ctx context.Context, m *model.Todo) (*int64, error) {
-	result, err := r.Q.Use(m).InsertCtx(ctx, false)
+	result, errTrans := tx.RunDefault(r.Q.Db, func(q *fazzdb.Query) (interface{}, error) {
+		r, err := r.Q.Use(m).InsertCtx(ctx, false)
 
-	if nil != err {
-		return nil, err
+		if nil != err {
+			return nil, err
+		}
+
+		return r, nil
+	})
+
+	if nil != errTrans {
+		return nil, errTrans
 	}
 
 	id := result.(int64)
@@ -30,13 +38,21 @@ func (r *todoRepository) Create(ctx context.Context, m *model.Todo) (*int64, err
 
 // Find a function that used to find the data by id
 func (r *todoRepository) Find(ctx context.Context, id int64) (*model.Todo, error) {
-	rows, err := r.Q.Use(r.Todo).
-		Where("id", id).
-		WithLimit(1).
-		AllCtx(ctx)
+	rows, errTrans := tx.RunDefault(r.Q.Db, func(q *fazzdb.Query) (interface{}, error) {
+		r, err := r.Q.Use(r.Todo).
+			Where("id", id).
+			WithLimit(1).
+			AllCtx(ctx)
 
-	if nil != err {
-		return nil, err
+		if nil != err {
+			return nil, err
+		}
+
+		return r, nil
+	})
+
+	if nil != errTrans {
+		return nil, errTrans
 	}
 
 	results := rows.([]*model.Todo)
@@ -45,9 +61,6 @@ func (r *todoRepository) Find(ctx context.Context, id int64) (*model.Todo, error
 	}
 
 	result := results[0]
-	if nil != err {
-		return nil, err
-	}
 
 	return result, nil
 }
@@ -82,4 +95,24 @@ func (r *todoRepository) All(ctx context.Context, conditions []fazzdb.SliceCondi
 	result := rows.([]*model.Todo)
 
 	return result, nil
+}
+
+func (r *todoRepository) Count(ctx context.Context) (*float64, error) {
+	result, errTrans := tx.RunDefault(r.Q.Db, func(q *fazzdb.Query) (interface{}, error) {
+
+		count, err := r.Q.Use(r.Todo).
+			CountCtx(ctx)
+
+		if nil != err {
+			return nil, err
+		}
+
+		return count, nil
+	})
+
+	if nil != errTrans {
+		return nil, errTrans
+	}
+
+	return result.(*float64), nil
 }

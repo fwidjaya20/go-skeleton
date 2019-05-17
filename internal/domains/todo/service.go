@@ -13,7 +13,7 @@ import (
 
 // ServiceInterface ...
 type ServiceInterface interface {
-	All(ctx context.Context, queryParams map[string]string) (contract.Paginate, error)
+	All(ctx context.Context, queryParams map[string]string) (*contract.Paginate, error)
 	Create(ctx context.Context, payload data.PayloadCreateTodo) (*model.Todo, error)
 }
 
@@ -40,17 +40,27 @@ func (s *service) Create(ctx context.Context, payload data.PayloadCreateTodo) (*
 	return s.Query.Find(ctx, *id)
 }
 
-func (s *service) All(ctx context.Context, queryParams map[string]string) (contract.Paginate, error) {
+func (s *service) All(ctx context.Context, queryParams map[string]string) (*contract.Paginate, error) {
 	// mestinya bikin struct isi array model dan metadata karena sifat paginate --> butuh total data
 
 	res, err := s.Query.All(ctx, queryParams)
 
-	d := contract.Paginate{}
+	if nil != err {
+		return nil, err
+	}
+
+	c, err := s.Query.Count(ctx)
+
+	if nil != err {
+		return nil, err
+	}
+
+	d := &contract.Paginate{}
 
 	d.Data = res
 	d.Metadata = contract.PaginateMetadata{
-		Total: 100,
+		Total: int64(*c),
 	}
 
-	return d, err
+	return d, nil
 }

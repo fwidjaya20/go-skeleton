@@ -44,3 +44,7 @@ func (q *todoQuery) All(ctx context.Context, queryParams map[string]string) ([]*
 
 	return q.Repository.All(ctx, conditions, nil, limit, offset)
 }
+
+func (q *todoQuery) Count(ctx context.Context) (*float64, error) {
+	return q.Repository.Count(ctx)
+}
