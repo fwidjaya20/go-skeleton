@@ -10,4 +10,5 @@ import (
 type TodoQueryInterface interface {
 	All(ctx context.Context, queryParams map[string]string) ([]*model.Todo, error)
 	Find(ctx context.Context, id int64) (*model.Todo, error)
+	Count(ctx context.Context) (*float64, error)
 }

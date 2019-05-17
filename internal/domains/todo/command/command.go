@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/payfazz/fazzlearning-api/config"
 	"github.com/payfazz/fazzlearning-api/internal/domains/todo/data"
 	"github.com/payfazz/fazzlearning-api/internal/domains/todo/model"
 	"github.com/payfazz/fazzlearning-api/internal/domains/todo/repository"
@@ -10,7 +11,10 @@ import (
 )
 
 // NewTodoCommand is a function to create new Command Instance
-func NewTodoCommand(q *fazzdb.Query) TodoCommandInterface {
+func NewTodoCommand() TodoCommandInterface {
+	db := config.GetDb()
+	q := fazzdb.QueryDb(db, config.GetIfQueryConfig(config.I_QUERY_CONFIG))
+
 	return &todoCommand{
 		Repository: repository.NewTodoRepository(q),
 	}

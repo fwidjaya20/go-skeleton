@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 
+	"github.com/payfazz/fazzlearning-api/config"
 	"github.com/payfazz/fazzlearning-api/internal/domains/todo/model"
 	"github.com/payfazz/fazzlearning-api/internal/domains/todo/repository"
 	"github.com/payfazz/fazzlearning-api/internal/values/todo"
@@ -11,7 +12,10 @@ import (
 )
 
 // NewTodoQuery is a function to create new Query Instance
-func NewTodoQuery(q *fazzdb.Query) TodoQueryInterface {
+func NewTodoQuery() TodoQueryInterface {
+	db := config.GetDb()
+	q := fazzdb.QueryDb(db, config.GetIfQueryConfig(config.I_QUERY_CONFIG))
+
 	return &todoQuery{
 		Repository: repository.NewTodoRepository(q),
 	}
@@ -39,4 +43,8 @@ func (q *todoQuery) All(ctx context.Context, queryParams map[string]string) ([]*
 	}
 
 	return q.Repository.All(ctx, conditions, nil, limit, offset)
+}
+
+func (q *todoQuery) Count(ctx context.Context) (*float64, error) {
+	return q.Repository.Count(ctx)
 }
