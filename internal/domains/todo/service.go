@@ -15,6 +15,8 @@ import (
 type ServiceInterface interface {
 	All(ctx context.Context, queryParams map[string]string) (*contract.Paginate, error)
 	Create(ctx context.Context, payload data.PayloadCreateTodo) (*model.Todo, error)
+	Update(ctx context.Context, payload data.PayloadUpdateTodo, id int64) (*model.Todo, error)
+	Delete(ctx context.Context, id int64) (*model.Todo, error)
 }
 
 type service struct {
@@ -38,6 +40,26 @@ func (s *service) Create(ctx context.Context, payload data.PayloadCreateTodo) (*
 	}
 
 	return s.Query.Find(ctx, *id)
+}
+
+func (s *service) Update(ctx context.Context, payload data.PayloadUpdateTodo, id int64) (*model.Todo, error) {
+	res, err := s.Command.Update(ctx, payload, id)
+
+	if !res {
+		return nil, err
+	}
+
+	return s.Query.Find(ctx, id)
+}
+
+func (s *service) Delete(ctx context.Context, id int64) (*model.Todo, error) {
+	res, err := s.Command.Delete(ctx, id)
+
+	if !res {
+		return nil, err
+	}
+
+	return s.Query.Find(ctx, id)
 }
 
 func (s *service) All(ctx context.Context, queryParams map[string]string) (*contract.Paginate, error) {

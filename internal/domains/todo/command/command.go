@@ -37,3 +37,37 @@ func (c *todoCommand) Create(ctx context.Context, payload data.PayloadCreateTodo
 
 	return id, nil
 }
+
+func (c *todoCommand) Update(ctx context.Context, payload data.PayloadUpdateTodo, id int64) (bool, error) {
+	t := model.TodoModel()
+
+	t.ID = id
+	t.Activity = payload.Activity
+	t.Description = payload.Description
+	t.StartDate = payload.StartDate
+	t.DueDate = payload.DueDate
+
+	res, err := c.Repository.Update(ctx, t)
+
+	if !res {
+		// You can replace any log logic here
+		return false, err
+	}
+
+	return true, err
+}
+
+func (c *todoCommand) Delete(ctx context.Context, id int64) (bool, error) {
+	t := model.TodoModel()
+
+	t.ID = id
+
+	res, err := c.Repository.Delete(ctx, t)
+
+	if !res {
+		// You can replace any log logic here
+		return false, err
+	}
+
+	return true, err
+}
