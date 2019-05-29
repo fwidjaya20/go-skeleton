@@ -36,6 +36,42 @@ func (r *todoRepository) Create(ctx context.Context, m *model.Todo) (*int64, err
 	return &id, nil
 }
 
+func (r *todoRepository) Update(ctx context.Context, m *model.Todo) (bool, error) {
+	_, errTrans := tx.RunDefault(r.Q.Db, func(q *fazzdb.Query) (interface{}, error) {
+		r, err := r.Q.Use(m).UpdateCtx(ctx)
+
+		if nil != err {
+			return nil, err
+		}
+
+		return r, nil
+	})
+
+	if nil != errTrans {
+		return false, errTrans
+	}
+
+	return true, errTrans
+}
+
+func (r *todoRepository) Delete(ctx context.Context, m *model.Todo) (bool, error) {
+	_, errTrans := tx.RunDefault(r.Q.Db, func(q *fazzdb.Query) (interface{}, error) {
+		r, err := r.Q.Use(m).DeleteCtx(ctx)
+
+		if nil != err {
+			return nil, err
+		}
+
+		return r, nil
+	})
+
+	if nil != errTrans {
+		return false, errTrans
+	}
+
+	return true, nil
+}
+
 // Find a function that used to find the data by id
 func (r *todoRepository) Find(ctx context.Context, id int64) (*model.Todo, error) {
 	rows, errTrans := tx.RunDefault(r.Q.Db, func(q *fazzdb.Query) (interface{}, error) {

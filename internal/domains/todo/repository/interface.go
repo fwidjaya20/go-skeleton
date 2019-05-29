@@ -12,5 +12,7 @@ type TodoRepositoryInterface interface {
 	Find(ctx context.Context, id int64) (*model.Todo, error)
 	All(ctx context.Context, conditions []fazzdb.SliceCondition, orders []fazzdb.Order, limit int, offset int) ([]*model.Todo, error)
 	Create(ctx context.Context, m *model.Todo) (*int64, error)
+	Update(ctx context.Context, m *model.Todo) (bool, error)
+	Delete(ctx context.Context, m *model.Todo) (bool, error)
 	Count(ctx context.Context) (*float64, error)
 }
